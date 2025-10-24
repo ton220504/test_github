@@ -46,3 +46,12 @@ async function readFileAsync(){
     }
 }
 readFileAsync();
+
+////
+console.log(1);
+setTimeout(()=>{
+    console.log('Timeout after 2 seconds');
+}, 2000);
+console.log(3);
+
+
