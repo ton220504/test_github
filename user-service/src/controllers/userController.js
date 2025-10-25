@@ -1,34 +1,48 @@
 const userModel = require('../models/userModel');
 
 // Get all users
-async function getAllUsers(req, res, next){
+async function getAllUsers(req, res, next) {
     try {
         const data = userModel.findAll();
-        res.status(200).json({success:true, data});
+        res.status(200).json({ success: true, data });
     } catch (error) {
         next(error);
     }
 }
 
 //get user by id
-async function getUserById(req, res, next){
+async function getUserById(req, res, next) {
     try {
-        const {id} = req.params;
+        const { id } = req.params;
         const user = userModel.findById(id);
-        if(!user) return res.status(404).json({success:false, message:'User not found'});
-        res.status(200).json({success:true, data:user});
+        if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+        res.status(200).json({ success: true, data: user });
+    } catch (error) {
+        next(error);
+    }
+}
+
+//update user
+async function updateUser(req, res, next) {
+    try {
+        const { id } = req.params;
+        const { name, email } = req.body;
+        if (!name || !email) return res.status(400).json({ success: false, message: 'Name and email are required' });
+        const updatedUser = userModel.updateUser(id, name, email);
+        if(!updatedUser) return res.status(404).json({success:false,message:'User not found'});
+        res.status(200).json({succcess:true, data:updatedUser});
     } catch (error) {
         next(error);
     }
 }
 
 //create new user
-async function createUser(req, res, next){
+async function createUser(req, res, next) {
     try {
-        const {name, email} = req.body;
-        if(!name || !email) return res.status(400).json({success:false, message:'Name and email are required'});
-        const newUser = userModel.createUser({name, email});
-        res.status(201).json({success:true, data:newUser});
+        const { name, email } = req.body;
+        if (!name || !email) return res.status(400).json({ success: false, message: 'Name and email are required' });
+        const newUser = userModel.createUser( name, email );
+        res.status(201).json({ success: true, data: newUser });
     } catch (error) {
         next(error);
     }
@@ -37,5 +51,6 @@ async function createUser(req, res, next){
 module.exports = {
     getAllUsers,
     getUserById,
-    createUser
+    createUser,
+    updateUser
 }
