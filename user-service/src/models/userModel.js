@@ -3,6 +3,8 @@ const { v4: uuidv4 } = require('uuid');
 const users = [
     { id: uuidv4(), name: 'Nguyen Van A', email: 'a@example.com' },
     { id: uuidv4(), name: 'Le Thi B', email: 'b@example.com' },
+    { id: uuidv4(), name: 'Ngo Thi C', email: 'c@example.com' },
+    { id: uuidv4(), name: 'Tran Van D', email: 'd@example.com' },
 ];
 
 function findAll() {
