@@ -1,45 +1,44 @@
-const {DataTypes, DataTypes} = require('sequelize');
-const {sequelize} = require('../config/db');
-const bcrypt = require('bcrypt');``
+const { sql } = require('../config/db');
+const bcrypt = require('bcrypt');
 
-const User = sequelize.define('User',{
-    id:{
-        type:DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV4,
-        primaryKey:true
-    },
-    name:{
-        type:DataTypes.STRING,
-        allowNull:false
-    },
-    email:{
-        type:DataTypes.STRING,
-        allowNull:false
-    },
-    password:{
-        type:DataTypes.STRING,
-        allowNull:false
-    }
-})
+// 🧱 Tạo người dùng mới
+async function createUser(name, email, password) {
+  const hashedPassword = await bcrypt.hash(password, 10);
 
+  const query = `
+    INSERT INTO Users (name, email, password)
+    OUTPUT INSERTED.id, INSERTED.name, INSERTED.email
+    VALUES (@name, @Email, @Password)
+  `;
 
-module.exports = User;
+  const result = await sql.request()
+    .input('name', sql.NVarChar, name)
+    .input('Email', sql.NVarChar, email)
+    .input('Password', sql.NVarChar, hashedPassword)
+    .query(query);
 
-//hash password before saving
-User.beforeCreate(async(user)=>{
-    const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(user.password, salt);
-})
-User.beforeUpdate(async(user)=>{
-    if(user.changed('password')){
-        const salt = await bcrypt.genSalt(10);
-        user.password = await bcrypt.hash(user.password, salt);
-    }
-})
-
-// so sánh
-User.prototype.matchPassword = async function(enteredPassword){
-    return await bcrypt.compare(enteredPassword, this.password);    
+  return result.recordset[0];
 }
 
-module.exports = User;
+// 🔍 Tìm người dùng theo email
+async function findUserByEmail(email) {
+  const result = await sql.request()
+    .input('Email', sql.NVarChar, email)
+    .query('SELECT * FROM Users WHERE email = @Email');
+  return result.recordset[0];
+}
+
+// 🔍 Tìm người dùng theo ID
+async function findUserById(id) {
+  const result = await sql.request()
+    .input('id', sql.UniqueIdentifier, id)
+    .query('SELECT id, name, email FROM Users WHERE id = @id');
+  return result.recordset[0];
+}
+
+// 🔐 So sánh mật khẩu
+async function matchPassword(enteredPassword, hashedPassword) {
+  return await bcrypt.compare(enteredPassword, hashedPassword);
+}
+
+module.exports = { createUser, findUserByEmail, findUserById, matchPassword };
