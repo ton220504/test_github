@@ -6,7 +6,7 @@ const PORT = process.env.PORT || 3002;
 (async () => {
   try {
     await poolConnect;
-    console.log('✅ Connected to SQL Server successfully!');
+    console.log('✅ Connected to SQL Server successfullyyyyy!');
     app.listen(PORT, () => {
       console.log(`🚀 User service is running on port ${PORT}`);
     });
