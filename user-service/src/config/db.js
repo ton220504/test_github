@@ -17,44 +17,30 @@
 //     console.error('❌ Database connection failed:', error);
 //   }
 // }
-const sql = require("mssql");
-require("dotenv").config();
+require('dotenv').config();
+const sql = require('mssql/msnodesqlv8');
 
 const config = {
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  server: process.env.DB_SERVER,
+  server: '(localdb)\\MSSQLLocalDB',
   database: process.env.DB_DATABASE,
-  port: parseInt(process.env.DB_PORT || "1433"),
+  driver: 'msnodesqlv8',
   options: {
-    encrypt: false,
-    trustServerCertificate: true
+    trustedConnection: true
   }
 };
 
-// Tạo pool kết nối duy nhất cho toàn ứng dụng
-let poolPromise;
-
 async function connectDB() {
   try {
-    if (!poolPromise) {
-      poolPromise = new sql.ConnectionPool(config)
-        .connect()
-        .then(pool => {
-          console.log("✅ Connected to SQL Server successfully!");
-          return pool;
-        })
-        .catch(err => {
-          console.error("❌ Database connection failed:", err);
-          poolPromise = null;
-        });
-    }
-    return poolPromise;
+    await sql.connect(config);
+    console.log("✅ SQL LocalDB connected successfully!");
   } catch (err) {
-    console.error("❌ Unexpected DB connection error:", err);
-    throw err;
+    console.error("❌ SQL Connection Error:", err);
   }
 }
 
-module.exports = { sql, connectDB };
+connectDB();
+
+module.exports = sql;
+
+
 
