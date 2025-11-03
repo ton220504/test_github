@@ -1,7 +1,6 @@
 const sql = require('../config/db');
 const bcrypt = require('bcrypt');
 
-// 🧱 Tạo người dùng mới
 async function createUser(name, email, password) {
   const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -14,7 +13,6 @@ async function createUser(name, email, password) {
   return result.recordset[0];
 }
 
-// 🔍 Tìm người dùng theo email
 async function findUserByEmail(email) {
   const result = await sql.query`
     SELECT * FROM Users WHERE email = ${email}
@@ -22,7 +20,6 @@ async function findUserByEmail(email) {
   return result.recordset[0];
 }
 
-// 🔍 Tìm người dùng theo ID
 async function findUserById(id) {
   const result = await sql.query`
     SELECT id, name, email FROM Users WHERE id = ${id}
@@ -30,7 +27,6 @@ async function findUserById(id) {
   return result.recordset[0];
 }
 
-// 🔐 So sánh mật khẩu
 async function matchPassword(enteredPassword, hashedPassword) {
   return bcrypt.compare(enteredPassword, hashedPassword);
 }
